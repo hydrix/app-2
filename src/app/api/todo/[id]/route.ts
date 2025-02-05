@@ -22,16 +22,11 @@ export const DELETE = async (
   { params }: { params: Promise<{ id: string }> }
 ) => {
   const { id } = await params;
-
   const existingTodo = todos.find((todo) => todo.id === id);
-
   if (!existingTodo) {
-    return NextResponse.json({ message: "Todo not found!" }, { status: 404 });
+    return NextResponse.json({ message: "todo not found!" }, { status: 404 });
   }
-
   const todoIndex = todos.findIndex((todo) => todo.id === id);
-
   todos.splice(todoIndex, 1);
-
-  return NextResponse.json({ message: "Todo deleted!" }, { status: 200 });
+  return NextResponse.json(existingTodo);
 };
