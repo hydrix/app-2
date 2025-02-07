@@ -23,6 +23,15 @@ export const TodoItem = ({
     }
   };
 
+const handleEdit = async (updatedTitle: string) => {
+  try {
+    await axios.put(`/api/todo/${todo.id}`, { title: updatedTitle });
+    toast.success("Todo-г амжилттай заслаа");
+  } catch {
+    toast.error("Todo-г заслахад алдаа гарлаа");
+  }
+};
+
 
   return (
     <li className="flex justify-between items-center">
@@ -31,7 +40,7 @@ export const TodoItem = ({
         {todo.title}
       </label>
       <div className="flex justify-end items-center gap-3">
-        <Button variant="outline">
+        <Button variant="outline" onClick={() => handleEdit(todo.title)}>
           <Pencil />
         </Button>
         <Button variant="outline" onClick={handleDelete}>
