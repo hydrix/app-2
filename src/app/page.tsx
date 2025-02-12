@@ -55,6 +55,13 @@ export default function Home() {
     }
   };
 
+  const onUpdate = (id: string, title: string) => {
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) => (todo.id === id ? { ...todo, title } : todo))
+    );
+  };
+
+
    const onDelete = (id: string) => {
      const newTodos = [...todos].filter((todo) => todo.id !== id);
      setTodos(newTodos);
@@ -88,7 +95,12 @@ export default function Home() {
       </Form>
       <ul className="pl-4 list-disc w-full max-w-[400px] flex flex-col gap-3">
         {todos.map((todo) => (
-          <TodoItem todo={todo} key={todo.id} onDelete={onDelete} />
+          <TodoItem
+            todo={todo}
+            key={todo.id}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+          />
         ))}
       </ul>
     </div>

@@ -1,18 +1,24 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Todo } from "@/types/todo";
-import { X } from "lucide-react";
+import { X, Pencil, Check } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Pencil } from "lucide-react";
 import axios from "axios";
+import { useState } from "react";
 
 export const TodoItem = ({
   todo,
   onDelete,
+  onUpdate,
 }: {
   todo: Todo;
   onDelete: (id: string) => void;
+  onUpdate: (id: string, title: string) => void;
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [newTitle, setNewTitle] = useState(todo.title);
+
   const handleDelete = async () => {
     try {
       await axios.delete(`/api/todo/${todo.id}`);
@@ -23,26 +29,47 @@ export const TodoItem = ({
     }
   };
 
-const handleEdit = async (updatedTitle: string) => {
-  try {
-    await axios.put(`/api/todo/${todo.id}`, { title: updatedTitle });
-    toast.success("Todo-г амжилттай заслаа");
-  } catch {
-    toast.error("Todo-г заслахад алдаа гарлаа");
-  }
-};
+  const handleEdit = async () => {
+    if (newTitle.trim() === "") {
+      toast.error("Todo хоосон байж болохгүй!");
+      return;
+    }
 
+    try {
+      await axios.put(`/api/todo/${todo.id}`, { title: newTitle });
+      onUpdate(todo.id, newTitle);
+      toast.success("Todo-г амжилттай заслаа");
+      setIsEditing(false);
+    } catch {
+      toast.error("Todo-г засахад алдаа гарлаа");
+    }
+  };
 
   return (
-    <li className="flex justify-between items-center">
-      <label className="flex gap-4 items-center">
+    <li className="flex justify-between items-center gap-2">
+      <label className="flex gap-4 items-center w-full">
         <Switch defaultChecked={todo.checked} />
-        {todo.title}
+        {isEditing ? (
+          <Input
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            className="w-full"
+          />
+        ) : (
+          <span>{todo.title}</span>
+        )}
       </label>
+
       <div className="flex justify-end items-center gap-3">
-        <Button variant="outline" onClick={() => handleEdit(todo.title)}>
-          <Pencil />
-        </Button>
+        {isEditing ? (
+          <Button variant="outline" onClick={handleEdit}>
+            <Check />
+          </Button>
+        ) : (
+          <Button variant="outline" onClick={() => setIsEditing(true)}>
+            <Pencil />
+          </Button>
+        )}
         <Button variant="outline" onClick={handleDelete}>
           <X />
         </Button>
