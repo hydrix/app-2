@@ -1,7 +1,6 @@
 import { nanoid } from "nanoid";
 import { NextRequest, NextResponse } from "next/server";
-
-export const todos = [{ id: nanoid(), title: "My todo", checked: false }];
+import { todos } from "./store";
 
 export const GET = () => {
   return NextResponse.json(todos);
@@ -9,7 +8,7 @@ export const GET = () => {
 
 export const POST = async (req: NextRequest) => {
   const { title } = await req.json();
-  const newTodo = { id: nanoid(), title: title, checked: false };
+  const newTodo = { id: nanoid(), title, checked: false };
   todos.push(newTodo);
-  return NextResponse.json(newTodo);
+  return NextResponse.json(newTodo, { status: 201 });
 };

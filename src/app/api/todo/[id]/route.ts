@@ -1,32 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
-import { todos } from "../route";
+import { todos, Todo } from "../store";
 
-export const PUT = async (
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) => {
+type Params = { params: Promise<{ id: string }> };
+
+export const PUT = async (req: NextRequest, { params }: Params) => {
   const { id } = await params;
+  const todo = todos.find((t: Todo) => t.id === id);
+  if (!todo)
+    return NextResponse.json({ error: "Todo not found" }, { status: 404 });
+
   const { title, checked } = await req.json();
-  const existingTodo = todos.find((todo) => todo.id === id);
-  if (!existingTodo) {
-    return NextResponse.json({ message: "todo not found!" }, { status: 404 });
-  }
-  const todoIndex = todos.findIndex((todo) => todo.id === id);
-  const updatingTodo = { id: existingTodo.id, title, checked };
-  todos.splice(todoIndex, 1, updatingTodo);
-  return NextResponse.json(updatingTodo);
+  if (title !== undefined) todo.title = title;
+  if (checked !== undefined) todo.checked = checked;
+
+  return NextResponse.json(todo);
 };
 
-export const DELETE = async (
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) => {
+export const PATCH = async (req: NextRequest, { params }: Params) => {
   const { id } = await params;
-  const existingTodo = todos.find((todo) => todo.id === id);
-  if (!existingTodo) {
-    return NextResponse.json({ message: "todo not found!" }, { status: 404 });
-  }
-  const todoIndex = todos.findIndex((todo) => todo.id === id);
-  todos.splice(todoIndex, 1);
-  return NextResponse.json(existingTodo);
+  const todo = todos.find((t: Todo) => t.id === id);
+  if (!todo)
+    return NextResponse.json({ error: "Todo not found" }, { status: 404 });
+
+  const { title, checked } = await req.json();
+  if (title !== undefined) todo.title = title;
+  if (checked !== undefined) todo.checked = checked;
+
+  return NextResponse.json(todo);
+};
+
+export const DELETE = async (_req: NextRequest, { params }: Params) => {
+  const { id } = await params;
+  const index = todos.findIndex((t: Todo) => t.id === id);
+  if (index === -1)
+    return NextResponse.json({ error: "Todo not found" }, { status: 404 });
+
+  const [deleted] = todos.splice(index, 1);
+  return NextResponse.json(deleted);
 };
